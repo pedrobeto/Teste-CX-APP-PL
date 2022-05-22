@@ -1,6 +1,32 @@
 * {
   box-sizing: border-box;
 }
+
 html {
   overflow-y: auto;
+}
+
+.content {
+  margin: 12px 0px;
+  max-width: 90%;
+}
+
+button {
+  font-size: 50px;
+  margin: 6px 0px;
+}
+
+#cep-button {
+  margin: 12px 0px;
+}
+
+#app {
+  padding: 0px 4px;
+}
+
+.spacer {
+  height: 2px;
+  width: 100%;
+  max-width: 90%;
+  background-color: #c1c1c1;
 }
