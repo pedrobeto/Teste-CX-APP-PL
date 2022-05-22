@@ -1,15 +1,11 @@
 import Core from "./Core.js";
 
-const client = ZAFClient.init();
-let settings;
-
-client.metadata().then((metadata) => {
-  settings = metadata.settings;
-});
-
 const Main = async () => {
+  const MainContentArea = document.getElementById("main-content");
 
-
+  const cepArea = Core.createCEPArea();
+  
+  MainContentArea.appendChild(cepArea);
 };
 
 export default Main;
