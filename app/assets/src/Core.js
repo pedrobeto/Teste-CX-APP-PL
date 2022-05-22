@@ -167,9 +167,90 @@ const createCEPArea = (client) => {
     errorContainer.classList.add('c-callout--error');
     errorContainer.classList.add('c-callout');
     const errroContainerTitle = document.createElement('strong');
-    errroContainerTitle.innerHTML = 'Something went wrong :(';
+    errroContainerTitle.innerHTML = 'Ocorreu um erro :(';
     const errorContainerBody = document.createElement('p');
-    errorContainerBody.innerHTML = 'Please try again later or contact your admin.'
+    errorContainerBody.innerHTML = 'Por favor, atualize o aplicativo ou contate o administrador.'
+
+    errorContainer.appendChild(errroContainerTitle);
+    errorContainer.appendChild(errorContainerBody);
+    return errorContainer;
+  }
+};
+
+const createTicketList = (listArray) => {
+  const createTicketItem = (_, id) => {
+    const ticketItem = document.createElement('li');
+    // creates an li to display ticket
+    ticketItem.style.listStyle = 'none';
+    ticketItem.innerHTML = `<b>${listArray[id].id}</b> - ${listArray[id].subject}`;
+    
+    // creates tag
+    const ticketItemTagDiv = document.createElement('div');
+    ticketItemTagDiv.classList.add('c-tag');
+    ticketItemTagDiv.classList.add('c-tag--sm');
+    const ticketItemTagSpan = document.createElement('span');
+    
+    // sets tag color based on ticket status
+    if (listArray[id].status === 'open') {
+      ticketItemTagDiv.classList.add('c-tag--red');
+      ticketItemTagSpan.innerHTML = 'Aberto';
+    } else if (listArray[id].status === 'pending') {
+      ticketItemTagSpan.innerHTML = 'Pendente';
+      ticketItemTagDiv.classList.add('c-tag--azure');
+    } else if (listArray[id].status === 'new') {
+      ticketItemTagSpan.innerHTML = 'Novo';
+      ticketItemTagDiv.classList.add('c-tag--yellow');
+    } else {
+      ticketItemTagSpan.innerHTML = 'Resolvido';
+      ticketItemTagDiv.classList.add('c-tag--grey');
+    }
+
+    ticketItemTagDiv.style.margin = '0px 6px';
+    ticketItemTagDiv.appendChild(ticketItemTagSpan);
+    ticketItem.appendChild(ticketItemTagDiv);
+
+    return ticketItem;
+  }
+
+  return Array.from({ length: listArray.length }, createTicketItem);
+}
+
+const createRequesterTicketListArea = async (client) => {
+  try {
+    // create wrapper
+    const contextInfo = await client.context();
+    let currentRequesterId = await client.get('ticket.requester.id');
+    currentRequesterId = currentRequesterId['ticket.requester.id'];
+
+    const RequesterListWrapper = document.createElement('div');
+    const TicketListElement = document.createElement('ul');
+    TicketListElement.style.margin = '12px 0px';
+    TicketListElement.setAttribute('id', 'requester-recent-ticket-list');
+    const TicketListLabel = document.createElement('label');
+    TicketListLabel.classList.add('c-text__label');
+    TicketListLabel.innerHTML = 'Últimos tickets do solicitante';
+    TicketListLabel.style.fontWeight = 600;
+    let requesterListTicketsDesc = await client.request({
+      url: `https://${contextInfo.account.subdomain}.zendesk.com/api/v2/search.json?query=type:ticket%20requester_id:${currentRequesterId}&sort_by=created_at&sort_order=desc`,
+      type: 'GET',
+      contentType: 'application/json',
+    });
+    const ticketsList = createTicketList(requesterListTicketsDesc.results.slice(0, 4));
+    ticketsList.forEach(ticket => TicketListElement.appendChild(ticket));
+
+    RequesterListWrapper.appendChild(TicketListLabel);
+    RequesterListWrapper.appendChild(TicketListElement);
+
+    return RequesterListWrapper;
+  } catch (error) {
+    console.log(error);
+    const errorContainer = document.createElement('div');
+    errorContainer.classList.add('c-callout--error');
+    errorContainer.classList.add('c-callout');
+    const errroContainerTitle = document.createElement('strong');
+    errroContainerTitle.innerHTML = 'Ocorreu um erro :(';
+    const errorContainerBody = document.createElement('p');
+    errorContainerBody.innerHTML = 'Por favor, atualize o aplicativo ou contate o administrador.'
 
     errorContainer.appendChild(errroContainerTitle);
     errorContainer.appendChild(errorContainerBody);
@@ -179,6 +260,7 @@ const createCEPArea = (client) => {
 
 const Core = {
   createCEPArea,
+  createRequesterTicketListArea
 };
 
 export default Core;
