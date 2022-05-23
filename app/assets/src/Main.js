@@ -1,14 +1,25 @@
 import Core from "./Core.js";
 
-const Main = async (client) => {
-  const MainContentArea = document.getElementById("main-content");
-  const SecondaryContentArea = document.getElementById("secondary-content");
+class Main {
+  constructor(client) {
+    this.client = client;
+  }
 
-  const cepArea = Core.createCEPArea(client);
-  const requesterLatestTicketsListArea = await Core.createRequesterTicketListArea(client);
+  async execute() {
+    const core = new Core(this.client);
+
+    // get parent element to each space/area of app
+    const MainContentArea = document.getElementById("main-content");
+    const SecondaryContentArea = document.getElementById("secondary-content");
   
-  MainContentArea.appendChild(cepArea);
-  SecondaryContentArea.appendChild(requesterLatestTicketsListArea);
-};
+    // build elements to those spaces
+    const cepArea = core.createCEPArea();
+    const requesterLatestTicketsListArea = await core.createRequesterTicketListArea();
+    
+    // make proper appends
+    MainContentArea.appendChild(cepArea);
+    SecondaryContentArea.appendChild(requesterLatestTicketsListArea);
+  }
+}
 
 export default Main;
